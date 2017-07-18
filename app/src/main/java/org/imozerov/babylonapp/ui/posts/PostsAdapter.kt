@@ -64,7 +64,7 @@ class PostsAdapter(private val chatClickCallback: (Post) -> Unit) :
                 // TODO fix me with plurals
                 item_post_comments_count.text = post.comments.size.toString()
 
-                item_user_name.text = post.author.name
+                item_user_name.text = post.userName
                 // TODO load avatar
 //                item_user_avatar.load()
 

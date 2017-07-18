@@ -1,14 +1,26 @@
 package org.imozerov.babylonapp.model;
 
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Relation;
+
+import org.imozerov.babylonapp.db.entities.CommentEntity;
+
 import java.util.List;
 
 public class Post {
+    @ColumnInfo(name = "id")
     private long id;
+    @ColumnInfo(name = "title")
     private String title;
+    @ColumnInfo(name = "body")
     private String body;
-    private User author;
-    private List<Comment> comments;
+    @ColumnInfo(name = "name")
+    private String userName;
+    @ColumnInfo(name = "avatar")
+    private String userAvatar;
+    @Relation(parentColumn = "id", entityColumn = "postId")
+    private List<CommentEntity> comments;
 
     public long getId() {
         return id;
@@ -34,19 +46,27 @@ public class Post {
         this.body = body;
     }
 
-    public User getAuthor() {
-        return author;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setAuthor(User author) {
-        this.author = author;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public List<Comment> getComments() {
+    public String getUserAvatar() {
+        return userAvatar;
+    }
+
+    public void setUserAvatar(String userAvatar) {
+        this.userAvatar = userAvatar;
+    }
+
+    public List<CommentEntity> getComments() {
         return comments;
     }
 
-    public void setComments(List<Comment> comments) {
+    public void setComments(List<CommentEntity> comments) {
         this.comments = comments;
     }
 
@@ -60,7 +80,10 @@ public class Post {
         if (id != post.id) return false;
         if (title != null ? !title.equals(post.title) : post.title != null) return false;
         if (body != null ? !body.equals(post.body) : post.body != null) return false;
-        if (author != null ? !author.equals(post.author) : post.author != null) return false;
+        if (userName != null ? !userName.equals(post.userName) : post.userName != null)
+            return false;
+        if (userAvatar != null ? !userAvatar.equals(post.userAvatar) : post.userAvatar != null)
+            return false;
         return comments != null ? comments.equals(post.comments) : post.comments == null;
     }
 
@@ -69,7 +92,8 @@ public class Post {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (body != null ? body.hashCode() : 0);
-        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (userName != null ? userName.hashCode() : 0);
+        result = 31 * result + (userAvatar != null ? userAvatar.hashCode() : 0);
         result = 31 * result + (comments != null ? comments.hashCode() : 0);
         return result;
     }
