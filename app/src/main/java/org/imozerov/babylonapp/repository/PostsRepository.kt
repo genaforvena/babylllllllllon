@@ -2,11 +2,15 @@ package org.imozerov.babylonapp.repository
 
 import org.imozerov.babylonapp.AppExecutors
 import org.imozerov.babylonapp.api.BabylonService
+import org.imozerov.babylonapp.api.model.CommentJson
 import org.imozerov.babylonapp.api.model.PostJson
+import org.imozerov.babylonapp.api.model.UserJson
 import org.imozerov.babylonapp.db.dao.CommentDao
 import org.imozerov.babylonapp.db.dao.PostDao
 import org.imozerov.babylonapp.db.dao.UserDao
+import org.imozerov.babylonapp.db.entities.CommentEntity
 import org.imozerov.babylonapp.db.entities.PostEntity
+import org.imozerov.babylonapp.db.entities.UserEntity
 import org.imozerov.babylonapp.model.Post
 import javax.inject.Inject
 
@@ -19,7 +23,7 @@ constructor(private val postDao: PostDao,
 
     fun posts() = object : NetworkBoundResource<List<Post>, List<PostJson>>(executors) {
         override fun saveCallResult(items: List<PostJson>) {
-            postDao.insertAll(items.toEntities())
+            postDao.insertAll(items.map { it.toEntity() })
         }
 
         // TODO check if data still valid before sending api request
@@ -31,13 +35,28 @@ constructor(private val postDao: PostDao,
     }
 }
 
-internal fun List<PostJson>.toEntities() = this.map {
+internal fun PostJson.toEntity(): PostEntity {
     val post = PostEntity()
-    with(it) {
-        post.id = id
-        post.authorId = authorId
-        post.body = body
-        post.title = title
-    }
-    return@map post
+    post.id = id
+    post.authorId = authorId
+    post.body = body
+    post.title = title
+    return post
+}
+
+internal fun UserJson.toEntity(): UserEntity {
+    val entity = UserEntity()
+    entity.id = id
+    entity.email = email
+    entity.name = name
+    return entity
+}
+
+internal fun CommentJson.toEntity(): CommentEntity {
+    val entity = CommentEntity()
+    entity.id = id
+    entity.body = body
+    entity.title = name
+    entity.postId = postId
+    return entity
 }
