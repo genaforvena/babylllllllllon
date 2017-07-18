@@ -23,7 +23,7 @@ class AppModule {
     @Singleton @Provides
     BabylonService provideBabylonService() {
         return new Retrofit.Builder()
-                .baseUrl("https://api.github.com/")
+                .baseUrl("http://jsonplaceholder.typicode.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(new LiveDataCallAdapterFactory())
                 .build()

@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity(), LifecycleRegistryOwner {
 
         val postsVM = ViewModelProviders.of(this, viewModelFactory).get(PostsViewModel::class.java)
         postsVM.posts.asLiveData().observe(this, Observer<Result<List<Post>>> { posts ->
+            // TODO handle error or loading status here
             adapter.setPosts(posts?.data ?: listOf())
         })
     }
