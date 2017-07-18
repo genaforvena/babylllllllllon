@@ -3,6 +3,8 @@ package org.imozerov.babylonapp;
 import android.app.Activity;
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
+
 import org.imozerov.babylonapp.db.AppDatabase;
 import org.imozerov.babylonapp.di.DaggerAppComponent;
 
@@ -24,6 +26,8 @@ public class BabylonApp extends Application implements HasActivityInjector {
                 .application(this)
                 .build()
                 .inject(this);
+
+        Stetho.initializeWithDefaults(this);
     }
 
     @Override
