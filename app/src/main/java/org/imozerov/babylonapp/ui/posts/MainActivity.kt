@@ -8,12 +8,15 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.imozerov.babylonapp.R
 import org.imozerov.babylonapp.model.Post
 import org.imozerov.babylonapp.model.Result
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), LifecycleRegistryOwner {
     private val lifecycleRegistry = LifecycleRegistry(this)
     override fun getLifecycle() = lifecycleRegistry
 
     private lateinit var adapter: PostsAdapter
+
+    @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     override fun onCreate(savedInstanceState: Bundle?) {
