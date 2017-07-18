@@ -11,4 +11,5 @@ constructor(application: Application,
             repo: PostsRepository)
     : AndroidViewModel(application) {
 
+    val posts = repo.posts()
 }

@@ -15,7 +15,7 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(PostsViewModel.class)
-    abstract ViewModel bindChatListView(PostsViewModel postsViewModel);
+    abstract ViewModel bindPostsViewModel(PostsViewModel postsViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory factory);
