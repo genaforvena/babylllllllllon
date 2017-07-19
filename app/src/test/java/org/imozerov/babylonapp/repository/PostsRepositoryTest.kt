@@ -164,7 +164,7 @@ class PostsRepositoryTest {
             }
         }
 
-    inner class CurrentThreadExecutor : Executor {
+    private class CurrentThreadExecutor : Executor {
         override fun execute(r: Runnable) {
             r.run()
         }
