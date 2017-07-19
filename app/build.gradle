@@ -49,4 +49,10 @@ dependencies {
     })
 
     testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-android:$mockitoVersion"
+    testImplementation ("android.arch.core:core-testing:$archLifecycleVersion", {
+        exclude group: 'com.android.support', module: 'support-compat'
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'support-core-utils'
+    })
 }

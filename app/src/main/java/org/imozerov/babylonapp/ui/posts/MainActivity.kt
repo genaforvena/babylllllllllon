@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity(), LifecycleRegistryOwner {
         setContentView(R.layout.activity_main)
 
         adapter = PostsAdapter(this::openDetails)
-        adapter.setHasStableIds(true)
         posts_list.adapter = adapter
 
         val postsVM = ViewModelProviders.of(this, viewModelFactory).get(PostsViewModel::class.java)

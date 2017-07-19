@@ -39,7 +39,9 @@ class PostsAdapter(private val chatClickCallback: (Post) -> Unit) :
                     val old = posts!![oldItemPosition]
                     return old.id == new.id
                             && old.title == new.title
+                            && old.userName == new.userName
                             && old.userAvatar == new.userAvatar
+                            && old.comments.size == new.comments.size
                 }
             })
             posts = newPosts
