@@ -19,4 +19,9 @@ public interface PostDao {
     @Query("Select posts.id, posts.title, posts.body, users.name, users.avatar " +
             "from posts left join users on posts.authorId = users.id")
     LiveData<List<Post>> getAll();
+
+    @Query("SELECT posts.id, posts.title, posts.body, users.name, users.avatar " +
+            "from posts left join users on posts.authorId = users.id " +
+            "where posts.id = :postId")
+    LiveData<Post> get(long postId);
 }

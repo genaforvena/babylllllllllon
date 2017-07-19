@@ -31,19 +31,25 @@ constructor(private val postDao: PostDao,
         val dbSource = postDao.all
         liveData.addSource(dbSource) {
             liveData.removeSource(dbSource)
-            liveData.addSource(babylonService.posts()) { result ->
+            val fetchPosts = babylonService.posts()
+            val fetchUsers = babylonService.users()
+            val fetchComments = babylonService.comments()
+            liveData.addSource(fetchPosts) { result ->
+                liveData.removeSource(fetchPosts)
                 Log.v("ILYA", "finished posts")
                 if (result?.isSuccessful() == true) {
                     executors.diskIO.execute { postDao.insertAll(result.body!!.map { it.toEntity() }) }
                 }
             }
-            liveData.addSource(babylonService.users()) { result ->
+            liveData.addSource(fetchUsers) { result ->
+                liveData.removeSource(fetchUsers)
                 Log.v("ILYA", "finished users")
                 if (result?.isSuccessful() == true) {
                     executors.diskIO.execute { userDao.insertAll(result.body!!.map { it.toEntity() }) }
                 }
             }
-            liveData.addSource(babylonService.comments()) { result ->
+            liveData.addSource(fetchComments) { result ->
+                liveData.removeSource(fetchComments)
                 Log.v("ILYA", "finished comments")
                 if (result?.isSuccessful() == true) {
                     executors.diskIO.execute { commentDao.insertAll(result.body!!.map { it.toEntity() }) }
