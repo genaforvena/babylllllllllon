@@ -21,11 +21,11 @@ class LiveDataCallAdapter<R>(private val responseType: Type) : CallAdapter<R, Li
                 super.onActive()
                 if (started.compareAndSet(false, true)) {
                     call.enqueue(object : Callback<R> {
-                        override fun onResponse(call: Call<R>, response: Response<R>) {
+                        override fun onResponse(newCall: Call<R>, response: Response<R>) {
                             postValue(ApiResponse(response))
                         }
 
-                        override fun onFailure(call: Call<R>, throwable: Throwable) {
+                        override fun onFailure(newCall: Call<R>, throwable: Throwable) {
                             postValue(ApiResponse<R>(throwable))
                         }
                     })
