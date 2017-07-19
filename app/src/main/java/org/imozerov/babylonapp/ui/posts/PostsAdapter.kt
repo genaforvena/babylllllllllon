@@ -36,8 +36,10 @@ class PostsAdapter(private val chatClickCallback: (Post) -> Unit) :
 
                 override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                     val new = newPosts[newItemPosition]
-                    val old = newPosts[oldItemPosition]
-                    return new == old
+                    val old = posts!![oldItemPosition]
+                    return old.id == new.id
+                            && old.title == new.title
+                            && old.userAvatar == new.userAvatar
                 }
             })
             posts = newPosts
