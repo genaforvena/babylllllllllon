@@ -1,8 +1,6 @@
 package org.imozerov.babylonapp.repository
 
 import android.arch.lifecycle.MediatorLiveData
-import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import org.imozerov.babylonapp.AppExecutors
 import org.imozerov.babylonapp.api.BabylonService
 import org.imozerov.babylonapp.api.model.CommentJson
@@ -36,21 +34,18 @@ constructor(private val postDao: PostDao,
             val fetchComments = babylonService.comments()
             liveData.addSource(fetchPosts) { result ->
                 liveData.removeSource(fetchPosts)
-                Log.v("ILYA", "finished posts")
                 if (result?.isSuccessful() == true) {
                     executors.diskIO.execute { postDao.insertAll(result.body!!.map { it.toEntity() }) }
                 }
             }
             liveData.addSource(fetchUsers) { result ->
                 liveData.removeSource(fetchUsers)
-                Log.v("ILYA", "finished users")
                 if (result?.isSuccessful() == true) {
                     executors.diskIO.execute { userDao.insertAll(result.body!!.map { it.toEntity() }) }
                 }
             }
             liveData.addSource(fetchComments) { result ->
                 liveData.removeSource(fetchComments)
-                Log.v("ILYA", "finished comments")
                 if (result?.isSuccessful() == true) {
                     executors.diskIO.execute { commentDao.insertAll(result.body!!.map { it.toEntity() }) }
                 }

@@ -11,14 +11,12 @@ import org.imozerov.babylonapp.db.dao.CommentDao
 import org.imozerov.babylonapp.db.dao.PostDao
 import org.imozerov.babylonapp.db.dao.UserDao
 import org.imozerov.babylonapp.model.Post
+import org.imozerov.babylonapp.testutil.successCall
 import org.junit.Before
-import org.junit.Test
-
-import org.junit.Assert.*
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.ArgumentMatcher
 import org.mockito.Mockito
 import java.util.concurrent.Executor
 
@@ -26,7 +24,7 @@ import java.util.concurrent.Executor
 class PostsRepositoryTest {
     @JvmField
     @Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var repo: PostsRepository
 
@@ -39,21 +37,22 @@ class PostsRepositoryTest {
     private val postsFromDb = MutableLiveData<List<Post>>()
     private val postsDbData = generatePosts(10)
 
-    private val postsFromService = MutableLiveData<List<PostJson>>()
     private val postsServiceData = generatePostJsons(10)
-
-    private val usersFromService = MutableLiveData<List<UserJson>>()
     private val usersServiceData = generateUserJsons(10)
-
-    private val commentsFromService = MutableLiveData<List<CommentJson>>()
-    private val commentsServiceData = generateUserJsons(10)
+    private val commentsServiceData = generateCommentJsons(10)
 
     @Before
     fun setUp() {
         postDao = Mockito.mock(PostDao::class.java)
-        commentDao = Mockito.mock(CommentDao::class.java)
         userDao = Mockito.mock(UserDao::class.java)
+        commentDao = Mockito.mock(CommentDao::class.java)
         babylonService = Mockito.mock(BabylonService::class.java)
+
+        Mockito.`when`(postDao.all).thenReturn(postsFromDb)
+        Mockito.`when`(babylonService.users()).thenReturn(successCall(usersServiceData))
+        Mockito.`when`(babylonService.comments()).thenReturn(successCall(commentsServiceData))
+        Mockito.`when`(babylonService.posts()).thenReturn(successCall(postsServiceData))
+
         executors = AppExecutors(CurrentThreadExecutor(),
                 CurrentThreadExecutor(), CurrentThreadExecutor())
 
@@ -61,22 +60,27 @@ class PostsRepositoryTest {
     }
 
     @Test
-    fun `posts are fetched from db if no service responses`() {
-        repo.posts()
+    fun `all data is fetched from service when posts changed in db`() {
+        postsFromDb.value = postsDbData
 
-        Mockito.verify(postDao).all
+        repo.posts().observeForever {}
+
+        Mockito.verify(babylonService).users()
+        Mockito.verify(babylonService).comments()
+        Mockito.verify(babylonService).posts()
     }
 
     @Test
-    fun `users are fetched from service when posts downloaded`() {
+    fun `all data stored in db as soon as fetched`() {
+        Mockito.`when`(babylonService.users()).thenReturn(successCall(usersServiceData))
+
         postsFromDb.value = postsDbData
-        usersFromService.value = usersServiceData
 
-        repo.posts().observeForever {
+        repo.posts().observeForever {}
 
-        }
-
-        Mockito.verify(userDao.insertAll(Mockito.argThat { it.map { it.id }.containsAll( usersServiceData.map { it.id })}))
+        Mockito.verify(commentDao).insertAll(Mockito.argThat { it.size == commentsServiceData.size })
+        Mockito.verify(userDao).insertAll(Mockito.argThat { it.size == usersServiceData.size })
+        Mockito.verify(postDao).insertAll(Mockito.argThat { it.size == postsServiceData.size })
     }
 
     private fun generatePostJsons(count: Long) =
