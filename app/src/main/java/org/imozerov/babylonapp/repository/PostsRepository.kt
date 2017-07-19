@@ -29,21 +29,25 @@ constructor(private val postDao: PostDao,
         val dbSource = postDao.all
         liveData.addSource(dbSource) {
             liveData.removeSource(dbSource)
+
+            // TODO this naive implementation. We'e just fetching everything from backend on each db update
             val fetchPosts = babylonService.posts()
-            val fetchUsers = babylonService.users()
-            val fetchComments = babylonService.comments()
             liveData.addSource(fetchPosts) { result ->
                 liveData.removeSource(fetchPosts)
                 if (result?.isSuccessful() == true) {
                     executors.diskIO.execute { postDao.insertAll(result.body!!.map { it.toEntity() }) }
                 }
             }
+
+            val fetchUsers = babylonService.users()
             liveData.addSource(fetchUsers) { result ->
                 liveData.removeSource(fetchUsers)
                 if (result?.isSuccessful() == true) {
                     executors.diskIO.execute { userDao.insertAll(result.body!!.map { it.toEntity() }) }
                 }
             }
+
+            val fetchComments = babylonService.comments()
             liveData.addSource(fetchComments) { result ->
                 liveData.removeSource(fetchComments)
                 if (result?.isSuccessful() == true) {
@@ -51,6 +55,8 @@ constructor(private val postDao: PostDao,
                 }
             }
 
+            // TODO We're optimistically saying that everything is always fine. In real word we should
+            // propagate API response status to the UI through VM with wrapper class' Result status.
             liveData.addSource(dbSource) { result ->
                 liveData.postValue(Result.success(result))
             }

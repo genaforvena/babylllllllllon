@@ -2,6 +2,8 @@ package org.imozerov.babylonapp.repository
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.MutableLiveData
+import org.hamcrest.BaseMatcher
+import org.hamcrest.Description
 import org.imozerov.babylonapp.AppExecutors
 import org.imozerov.babylonapp.api.BabylonService
 import org.imozerov.babylonapp.api.model.CommentJson
@@ -11,7 +13,12 @@ import org.imozerov.babylonapp.db.dao.CommentDao
 import org.imozerov.babylonapp.db.dao.PostDao
 import org.imozerov.babylonapp.db.dao.UserDao
 import org.imozerov.babylonapp.model.Post
+import org.imozerov.babylonapp.model.Result
+import org.imozerov.babylonapp.model.Result.Status.LOADING
+import org.imozerov.babylonapp.model.Result.Status.SUCCESS
+import org.imozerov.babylonapp.repository.PostsRepositoryTest.StatusMatcher.Companion.hasStatus
 import org.imozerov.babylonapp.testutil.successCall
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -72,8 +79,6 @@ class PostsRepositoryTest {
 
     @Test
     fun `all data stored in db as soon as fetched`() {
-        Mockito.`when`(babylonService.users()).thenReturn(successCall(usersServiceData))
-
         postsFromDb.value = postsDbData
 
         repo.posts().observeForever {}
@@ -81,6 +86,40 @@ class PostsRepositoryTest {
         Mockito.verify(commentDao).insertAll(Mockito.argThat { it.size == commentsServiceData.size })
         Mockito.verify(userDao).insertAll(Mockito.argThat { it.size == usersServiceData.size })
         Mockito.verify(postDao).insertAll(Mockito.argThat { it.size == postsServiceData.size })
+    }
+
+    @Test
+    fun `result should change its status from loading to success`() {
+        val observedStatuses = mutableListOf<Result<List<Post>>?>()
+
+        repo.posts().observeForever { observedStatuses.add(it) }
+        postsFromDb.value = postsDbData
+
+        assertThat(observedStatuses.first(), hasStatus(LOADING))
+        assertThat(observedStatuses.last(), hasStatus(SUCCESS))
+    }
+
+
+    private class StatusMatcher(private val status: Result.Status) : BaseMatcher<Result<List<Post>>?>() {
+        override fun describeTo(description: Description?) {
+            TODO("not implemented")
+        }
+
+        override fun describeMismatch(item: Any?, mismatchDescription: Description?) {
+            TODO("not implemented")
+        }
+
+        override fun matches(item: Any?): Boolean {
+            if (item is Result<*>) {
+                return item.status == status
+            }
+            return false
+        }
+
+        companion object {
+            fun hasStatus(status: Result.Status) = StatusMatcher(status)
+        }
+
     }
 
     private fun generatePostJsons(count: Long) =

@@ -13,6 +13,8 @@ class DetailsViewModel @Inject
 constructor(app: Application, private val postDao: PostDao): AndroidViewModel(app) {
     private val postId = MutableLiveData<Long>()
 
+    // TODO We'e fetching here from db. In a real world we would initiate api call
+    // like we did in PostsViewModel. Result in this case should also be wrapped in Result class.
     val postInfo = Transformations.switchMap(postId) { postId ->
         if (postId == 0L) {
             return@switchMap AbsentLiveData.create<Post>()
