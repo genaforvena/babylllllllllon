@@ -5,12 +5,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "comments",
-        indices = @Index("id"),
-        foreignKeys = @ForeignKey(entity = PostEntity.class,
-                parentColumns = {"id"},
-                childColumns = {"postId"},
-                onDelete = ForeignKey.CASCADE))
+@Entity(tableName = "comments", indices = { @Index("id"), @Index("postId") })
 public class CommentEntity {
     @PrimaryKey
     private long id;

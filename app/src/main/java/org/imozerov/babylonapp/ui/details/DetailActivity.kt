@@ -39,6 +39,7 @@ class DetailActivity : AppCompatActivity(), LifecycleRegistryOwner {
 
     fun bind(post: Post) {
         with (post) {
+            supportActionBar?.title = title
             details_author_name.text = userName
             details_body.text = body
             details_title.text = title
